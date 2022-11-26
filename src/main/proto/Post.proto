@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.scs.apps.twitt";
+option java_outer_classname = "PostProto";
+
+message PostKey {
+  string id = 1;
+}
+
+message PostMessage {
+  string id = 1;
+  string content = 2;
+  float rating = 3;
+  bool is_deleted = 4;
+  User author = 5;
+
+  google.protobuf.Timestamp created_at = 98;
+  google.protobuf.Timestamp updated_at = 99;
+}
+
+message User {
+  string id = 1;
+  bool is_deleted = 2;
+  string name = 3;
+}
