@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: "twitt"
+  cloud.stream:
+    function:
+      definition: convertPostCdcToPostMessage;test;
+    kafka:
+      binder:
+        brokers: localhost:29092
+        configuration:
+          processing:
+            guarantee: exactly_once
+    bindings:
+      # Post Transformer
+      convertPostCdcToPostMessage-in-0:
+        destination: post-created
+      convertPostCdcToPostMessage-out-0:
+        destination: post-transformed
+        producer:
+          partition-count: 1
+      test-in-0:
+        destination: post-transformed

@@ -1,6 +1,11 @@
 spring:
+  application:
+    name: "twitt"
   cloud:
     stream:
       kafka:
         binder:
-          brokers: localhost:9092
+          brokers: localhost:29092
+          configuration:
+            processing:
+              guarantee: exactly_once

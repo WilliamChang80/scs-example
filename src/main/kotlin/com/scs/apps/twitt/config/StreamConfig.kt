@@ -2,8 +2,6 @@ package com.scs.apps.twitt.config
 
 import lombok.AllArgsConstructor
 import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.SpringApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.StreamsBuilderFactoryBean
@@ -18,14 +16,18 @@ class StreamConfig {
         return StreamsBuilderFactoryBeanConfigurer {
             factoryBean: StreamsBuilderFactoryBean ->
             run {
-                factoryBean.setStreamsUncaughtExceptionHandler(getStreamsUncaughtExceptionHandler())
+                factoryBean.setUncaughtExceptionHandler(getStreamsUncaughtExceptionHandler())
             }
         }
     }
 
-    private fun getStreamsUncaughtExceptionHandler(): StreamsUncaughtExceptionHandler {
-        return StreamsUncaughtExceptionHandler {
-            StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_APPLICATION;
+    private fun getStreamsUncaughtExceptionHandler(): Thread.UncaughtExceptionHandler {
+        return Thread.UncaughtExceptionHandler  {
+                _: Thread, e: Throwable ->
+            run {
+                println(e.message)
+                StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_APPLICATION;
+            }
         }
     }
 }

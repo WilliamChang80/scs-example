@@ -4,27 +4,22 @@ import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
 option java_package = "com.scs.apps.twitt";
-option java_outer_classname = "PostProto";
+option java_outer_classname = "PostCdcProto";
 
-message PostKey {
+message PostCdcKey {
   string id = 1;
 }
 
-message PostMessage {
+message PostCdcMessage {
   string id = 1;
   string content = 2;
   float rating = 3;
   bool is_deleted = 4;
-  User author = 5;
+  string unused_field = 5;
   string title = 6;
   string creator_id = 7;
 
+  google.protobuf.Timestamp deleted_at = 97;
   google.protobuf.Timestamp created_at = 98;
   google.protobuf.Timestamp updated_at = 99;
-}
-
-message User {
-  string id = 1;
-  bool is_deleted = 2;
-  string name = 3;
 }
