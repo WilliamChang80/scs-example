@@ -12,7 +12,7 @@ import java.util.function.Consumer
 class PostJoinerFunction {
 
     @Bean
-    fun test(): Consumer<KStream<PostKey, PostMessage>> {
+    fun joinPost(): Consumer<KStream<PostKey, PostMessage>> {
         return Consumer { func ->
             func
                 .peek { key, value -> println("Received PostMessage with key: $key and message: $value") }

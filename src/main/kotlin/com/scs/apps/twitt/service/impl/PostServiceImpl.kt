@@ -5,7 +5,6 @@ import com.scs.apps.twitt.PostCdcKey
 import com.scs.apps.twitt.PostCdcMessage
 import com.scs.apps.twitt.constant.KafkaTopic
 import com.scs.apps.twitt.dto.CreatePostRequestDto
-import com.scs.apps.twitt.producer.MessageProducer
 import com.scs.apps.twitt.producer.StreamsProducer
 import com.scs.apps.twitt.serde.ProtobufSerde
 import com.scs.apps.twitt.service.PostService

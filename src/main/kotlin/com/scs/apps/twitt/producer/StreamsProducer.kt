@@ -2,7 +2,10 @@ package com.scs.apps.twitt.producer
 
 import org.apache.kafka.clients.admin.Admin
 import org.apache.kafka.clients.admin.NewTopic
-import org.apache.kafka.clients.producer.*
+import org.apache.kafka.clients.producer.Callback
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerConfig
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.streams.KeyValue
 import org.jetbrains.kotlin.com.google.common.collect.ImmutableList
