@@ -1,0 +1,24 @@
+syntax = 'proto3';
+
+package com.scs.apps.twitt;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "EnrichedCommentProto";
+
+import "User.proto";
+
+message EnrichedCommentKey {
+  string id = 1;
+}
+
+message EnrichedCommentMessage {
+  string id = 1;
+  string user_id = 2;
+  string comment = 3;
+  UserMessage user = 4;
+
+  google.protobuf.Timestamp updated_at = 98;
+  google.protobuf.Timestamp created_at = 99;
+}

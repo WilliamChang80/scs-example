@@ -67,14 +67,14 @@ protobuf {
 	}
 }
 
-sourceSets{
-	main{
-		java{
+sourceSets {
+	main {
+		java {
 			srcDir 'build/generated/source/proto/main/java'
 		}
 	}
-	test{
-		java{
+	test {
+		java {
 			srcDir 'build/generated/source/proto/test/java'
 		}
 	}

@@ -1,24 +1,31 @@
 syntax = "proto3";
 
+package com.scs.apps.twitt;
+
 import "google/protobuf/timestamp.proto";
+import "Activity.proto";
+import "User.proto";
+import "EnrichedComment.proto";
 
 option java_multiple_files = true;
-option java_package = "com.scs.apps.twitt";
-option java_outer_classname = "PostProto";
+option java_outer_classname = "EnrichedPostProto";
 
-message PostKey {
+message EnrichedPostKey {
   string id = 1;
 }
 
-message PostMessage {
+message EnrichedPostMessage {
   string id = 1;
   string content = 2;
   float rating = 3;
   bool is_deleted = 4;
-  string user_id = 5;
   string title = 6;
   string creator_id = 7;
+  UserMessage user = 8;
+  repeated EnrichedCommentMessage comments = 9;
+  ActivityMessage activity = 10;
 
   google.protobuf.Timestamp created_at = 98;
   google.protobuf.Timestamp updated_at = 99;
 }
+

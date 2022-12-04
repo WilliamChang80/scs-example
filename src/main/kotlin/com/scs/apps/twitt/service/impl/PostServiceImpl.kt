@@ -38,8 +38,6 @@ class PostServiceImpl(private val streamsProducer: StreamsProducer) : PostServic
             .setIsDeleted(false)
             .build()
 
-//        messageProducer.sendMessage(message.toByteArray(), messageKey.toByteArray(), KafkaTopic.CREATE_POST_TOPIC)
-
         streamsProducer.publish(
             KafkaTopic.CREATE_POST_TOPIC, KeyValue.pair(messageKey, message), ProtobufSerde(PostCdcKey.parser()),
             ProtobufSerde(PostCdcMessage.parser())

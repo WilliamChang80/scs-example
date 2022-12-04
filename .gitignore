@@ -37,3 +37,6 @@ out/
 .vscode/
 
 **application.yml
+
+src/generated/**
+src/generated-sources/**

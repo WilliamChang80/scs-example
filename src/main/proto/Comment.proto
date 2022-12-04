@@ -1,0 +1,19 @@
+syntax = 'proto3';
+
+package com.scs.apps.twitt;
+
+import "google/protobuf/timestamp.proto";
+
+message CommentKey {
+  string id = 1;
+}
+
+message CommentMessage {
+  string id = 1;
+  string user_id = 2;
+  string comment = 3;
+
+  google.protobuf.Timestamp updated_at = 98;
+  google.protobuf.Timestamp created_at = 99;
+}
+

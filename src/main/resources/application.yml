@@ -5,7 +5,7 @@ spring:
     stream:
       kafka:
         binder:
-          brokers: localhost:29092
+          brokers: localhost:9092
           configuration:
             processing:
               guarantee: exactly_once

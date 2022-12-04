@@ -13,7 +13,7 @@ import java.util.*
 class StreamsProducer {
     private val REPLICATION_FACTOR: Short = 5
     private val PARTITIONS: Short = 5
-    private val bootstrapServer = "localhost:29092"
+    private val bootstrapServer = "localhost:9092"
 
     fun <K, V> publish(topic: String, message: KeyValue<K, V>, keySerde: Serde<K>, valueSerde: Serde<V>) {
         return publish(topic, ImmutableList.of(message), keySerde, valueSerde)

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package com.scs.apps.twitt;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "UserProto";
+
+message UserKey {
+  string id = 1;
+}
+
+message UserMessage {
+  string id = 1;
+  string name = 2;
+  string profile_pic = 3;
+
+  google.protobuf.Timestamp updated_at = 98;
+  google.protobuf.Timestamp created_at = 99;
+}

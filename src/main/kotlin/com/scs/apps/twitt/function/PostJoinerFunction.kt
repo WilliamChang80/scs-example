@@ -12,10 +12,9 @@ import java.util.function.Consumer
 class PostJoinerFunction {
 
     @Bean
-    fun test(): Consumer<KStream<ByteArray, ByteArray>> {
+    fun test(): Consumer<KStream<PostKey, PostMessage>> {
         return Consumer { func ->
             func
-                .map { k, v -> convert(k, v) }
                 .peek { key, value -> println("Received PostMessage with key: $key and message: $value") }
         }
     }
