@@ -1,30 +1,46 @@
 spring:
   application:
     name: "twitt"
-  cloud:
+  cloud.stream:
     function:
-      definition: convertPostCdcToPostMessage;test;
-    stream:
-      kafka:
+      definition: convertPostCdcToPostMessage;postJoinHandler;commentUserJoiner;
+
+    bindings:
+      # Post Transformer
+      convertPostCdcToPostMessage-in-0:
+        destination: post-created
+      convertPostCdcToPostMessage-out-0:
+        destination: post-transformed
+      # Post Joiner
+      postJoinHandler-in-0:
+        destination: post-transformed
+      # Comment User Joiner
+      commentUserJoiner-in-0:
+        destination: comment-created
+      commentUserJoiner-in-1:
+        destination: user-updated
+      commentUserJoiner-out-0:
+        destination: comment-user-joined
+
+    kafka:
+      streams:
+        bindings:
+          commentUserJoiner-in-0:
+            consumer:
+              start-offset: earliest
+              materialized-as: comment-user-state-store
+          convertPostCdcToPostMessage-in-0:
+            consumer:
+              start-offset: earliest
+          postJoinHandler-in-0:
+            consumer:
+              start-offset: earliest
+              materialized-as: joined-post-state-store
+
         binder:
           brokers: localhost:9092
           configuration:
             processing:
               guarantee: exactly_once
-      bindings:
-        # Post Transformer
-        convertPostCdcToPostMessage-in-0:
-          destination: post-created
-        convertPostCdcToPostMessage-out-0:
-          destination: post-transformed
-          producer:
-            partition-count: 1
-        test-in-0:
-          destination: post-transformed
-
-logging:
-  level:
-    org:
-      springframework:
-        cloud: DEBUG
-        integration: DEBUG
+            max.poll.records: 1
+            max.poll.interval.ms: 10000

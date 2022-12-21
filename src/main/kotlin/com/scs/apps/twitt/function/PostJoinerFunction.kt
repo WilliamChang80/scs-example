@@ -1,9 +1,6 @@
 package com.scs.apps.twitt.function
 
-import com.scs.apps.twitt.PostKey
-import com.scs.apps.twitt.PostMessage
-import org.apache.kafka.streams.KeyValue
-import org.apache.kafka.streams.kstream.KStream
+import com.scs.apps.twitt.constant.PostKStream
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.function.Consumer
@@ -12,21 +9,10 @@ import java.util.function.Consumer
 class PostJoinerFunction {
 
     @Bean
-    fun joinPost(): Consumer<KStream<PostKey, PostMessage>> {
+    fun joinPost(): Consumer<PostKStream> {
         return Consumer { func ->
-            func
-                .peek { key, value -> println("Received PostMessage with key: $key and message: $value") }
+            func.peek { key, value -> println("Received PostMessage with key: $key and message: $value") }
         }
-    }
-
-    private fun convert(k: ByteArray, v: ByteArray): KeyValue<PostKey, PostMessage>? {
-        try {
-            return KeyValue.pair(PostKey.parseFrom(k), PostMessage.parseFrom(v))
-        } catch (e: Exception) {
-            println("exception occurred $e")
-        }
-
-        return null
     }
 
 }
