@@ -1,5 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.9.0'
+	}
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.7.5'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
@@ -7,6 +16,7 @@ plugins {
 	id 'org.jetbrains.kotlin.plugin.spring' version '1.6.21'
 	id 'com.google.protobuf' version '0.8.19'
 	id "com.diffplug.spotless" version '6.8.0'
+	//	id 'info.solidsoft.pitest' version '1.9.0'
 }
 
 group = 'com.scs.apps'
@@ -47,6 +57,7 @@ dependencies {
 	implementation 'com.google.protobuf:protobuf-gradle-plugin:0.9.1'
 	implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 	implementation 'com.google.protobuf:protobuf-java:3.21.9'
+	implementation 'io.github.microutils:kotlin-logging-jvm:3.0.4'
 
 	protobuf 'com.google.protobuf:protobuf-java:3.21.9'
 
@@ -67,6 +78,19 @@ protobuf {
 		artifact = 'com.google.protobuf:protoc:3.21.5'
 	}
 }
+
+//pitest {
+//	threads = 4
+//	junit5PluginVersion = '1.1.0'
+//	outputFormats = ['XML', 'HTML']
+//	excludedTestClasses = ['com.scs.apps.twitt.config.*',
+//						   'com.scs.apps.twitt.constant.*',
+//						   'com.scs.apps.twitt.dto.*']
+//	exportLineCoverage = true
+//	coverageThreshold = 90
+//	testStrengthThreshold = 90
+//	mutationThreshold = 100
+//}
 
 sourceSets {
 	main {

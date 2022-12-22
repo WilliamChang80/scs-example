@@ -1,5 +1,6 @@
 package com.scs.apps.twitt.producer
 
+import mu.KotlinLogging
 import org.apache.kafka.clients.admin.Admin
 import org.apache.kafka.clients.admin.NewTopic
 import org.apache.kafka.clients.producer.Callback
@@ -17,6 +18,7 @@ class StreamsProducer {
     private val REPLICATION_FACTOR: Short = 5
     private val PARTITIONS: Short = 5
     private val bootstrapServer = "localhost:9092"
+    private val logger = KotlinLogging.logger {}
 
     fun <K, V> publish(topic: String, message: KeyValue<K, V>, keySerde: Serde<K>, valueSerde: Serde<V>) {
         return publish(topic, ImmutableList.of(message), keySerde, valueSerde)
@@ -39,20 +41,20 @@ class StreamsProducer {
                         val producerRecord: ProducerRecord<Any, Any> = ProducerRecord(topic, pair.key, pair.value)
                         producer.send(producerRecord, getCallback())
                     }
-                    println("Message produced to $topic")
+                    logger.info("Message produced to $topic")
                 }
             }
         } catch (e: Exception) {
-            println("Failed produce message, " + e.localizedMessage)
+            logger.error("Failed produce message, " + e.localizedMessage)
         }
     }
 
     private fun getCallback(): Callback {
         return Callback { metadata, exception ->
             if (exception != null) {
-                println("Producing records encountered error: $exception")
+                logger.info("Producing records encountered error: $exception")
             } else {
-                println("Record produced - offset - ${metadata.offset()} timestamp - ${metadata.timestamp()}")
+                logger.error("Record produced - offset - ${metadata.offset()} timestamp - ${metadata.timestamp()}")
             }
         }
     }

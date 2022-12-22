@@ -13,7 +13,7 @@ import com.scs.apps.twitt.constant.UserKTable
 import com.scs.apps.twitt.joiner.CommentJoiner
 import com.scs.apps.twitt.serde.CommentSerde
 import com.scs.apps.twitt.serde.EnrichedCommentSerde
-import lombok.extern.slf4j.Slf4j
+import mu.KotlinLogging
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.kstream.Named
 import org.apache.kafka.streams.kstream.TableJoined
@@ -23,11 +23,12 @@ import java.util.function.BiFunction
 import java.util.function.Function
 
 @Configuration
-@Slf4j
 class CommentJoinerFunction(
     private val commentSerde: CommentSerde, private val enrichedCommentSerde: EnrichedCommentSerde,
     private val commentJoiner: CommentJoiner
 ) {
+
+    private val logger = KotlinLogging.logger {}
 
     @Bean
     fun commentUserJoiner(): BiFunction<CommentKTable, UserKTable, EnrichedCommentKStream> {
@@ -41,16 +42,16 @@ class CommentJoinerFunction(
             )
                 .toStream(Named.`as`(MaterializedConstant.COMMENT_USER_JOINED))
                 .selectKey(
-                    { key: CommentKey, g: EnrichedCommentMessage? -> selectEnrichedCommentKey(key, g) },
+                    { key: CommentKey, _ -> selectEnrichedCommentKey(key) },
                     Named.`as`(MaterializedConstant.COMMENT_USER_JOIN_STREAM_REKEY_ID)
                 )
                 .peek { key: EnrichedCommentKey, value: EnrichedCommentMessage? ->
-                    println("joined EnrichedCommentMessage with key $key and value $value")
+                    logger.info("joined EnrichedCommentMessage with key $key and value $value")
                 }
         }
     }
 
-    private fun selectEnrichedCommentKey(key: CommentKey, g: EnrichedCommentMessage?): EnrichedCommentKey {
+    private fun selectEnrichedCommentKey(key: CommentKey): EnrichedCommentKey {
         return EnrichedCommentKey.newBuilder().setId(key.id).build()
     }
 
