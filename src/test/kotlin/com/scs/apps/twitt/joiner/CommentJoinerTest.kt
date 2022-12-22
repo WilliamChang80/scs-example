@@ -46,9 +46,9 @@ class CommentJoinerTest {
         userMessage: UserMessage?,
         expected: EnrichedCommentMessage
     ) {
-//        val actual: EnrichedCommentMessage = commentJoiner.joinCommentWithUser().apply(commentMessage, userMessage)
-//
-//        assertEquals(expected, actual)
+        val actual: EnrichedCommentMessage = commentJoiner.joinCommentWithUser(commentMessage, userMessage)
+
+        assertEquals(expected, actual)
     }
 
     fun createCommentMessage(comment: String): CommentMessage {
