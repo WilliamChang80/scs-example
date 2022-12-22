@@ -10,14 +10,17 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.streams.KeyValue
 import org.jetbrains.kotlin.com.google.common.collect.ImmutableList
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class StreamsProducer {
-    private val REPLICATION_FACTOR: Short = 5
-    private val PARTITIONS: Short = 5
-    private val bootstrapServer = "localhost:9092"
+class StreamsProducer(
+    @Value("\${bootstrap-servers:localhost:9092}")
+    private val bootstrapServer: String
+) {
+    private val REPLICATION_FACTOR: Short = 1
+    private val PARTITIONS: Short = 2
     private val logger = KotlinLogging.logger {}
 
     fun <K, V> publish(topic: String, message: KeyValue<K, V>, keySerde: Serde<K>, valueSerde: Serde<V>) {

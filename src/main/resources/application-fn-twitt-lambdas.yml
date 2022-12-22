@@ -3,7 +3,7 @@ spring:
     name: "twitt"
   cloud.stream:
     function:
-      definition: convertPostCdcToPostMessage;postJoinHandler;commentUserJoiner;
+      definition: convertPostCdcToPostMessage;commentUserJoiner;materializeEnrichedComment;joinPost;
 
     bindings:
       # Post Transformer
@@ -12,7 +12,7 @@ spring:
       convertPostCdcToPostMessage-out-0:
         destination: post-transformed
       # Post Joiner
-      postJoinHandler-in-0:
+      joinPost-in-0:
         destination: post-transformed
       # Comment User Joiner
       commentUserJoiner-in-0:
@@ -20,6 +20,9 @@ spring:
       commentUserJoiner-in-1:
         destination: user-updated
       commentUserJoiner-out-0:
+        destination: comment-user-joined
+      # Joined Comment Materialize
+      materializeEnrichedComment-in-0:
         destination: comment-user-joined
 
     kafka:
@@ -32,15 +35,25 @@ spring:
           convertPostCdcToPostMessage-in-0:
             consumer:
               start-offset: earliest
-          postJoinHandler-in-0:
+          joinPost-in-0:
             consumer:
               start-offset: earliest
               materialized-as: joined-post-state-store
 
         binder:
+          functions:
+            convertPostCdcToPostMessage:
+              application-id: "convertPostCdcToPostMessage"
+            joinPost:
+              application-id: "joinPost"
+            commentUserJoiner:
+              application-id: "commentUserJoiner"
+            materializeEnrichedComment:
+              application-id: "materializeEnrichedComment"
           brokers: localhost:9092
           configuration:
             processing:
               guarantee: exactly_once
-            max.poll.records: 1
+            max.poll.records: 10
             max.poll.interval.ms: 10000
+

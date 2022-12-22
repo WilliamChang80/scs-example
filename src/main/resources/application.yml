@@ -9,3 +9,4 @@ spring:
           configuration:
             processing:
               guarantee: exactly_once
+bootstrap-servers: localhost:9092
