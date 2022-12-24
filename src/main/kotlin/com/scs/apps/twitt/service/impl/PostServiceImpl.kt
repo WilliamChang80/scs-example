@@ -18,7 +18,8 @@ import java.util.*
 class PostServiceImpl(private val streamsProducer: StreamsProducer, private val postCdcSerde: PostCdcSerde) : PostService {
 
     override fun createPost(createPostRequestDto: RequestDto.CreatePostRequestDto, userId: String) {
-        val uuid: String = UUID.randomUUID().toString()
+//        val uuid: String = UUID.randomUUID().toString()
+        val uuid = userId
         val now = Instant.now()
         val createdAt = Timestamp.newBuilder().setSeconds(now.epochSecond).setNanos(now.nano).build()
 

@@ -18,6 +18,7 @@ message EnrichedCommentMessage {
   string user_id = 2;
   string comment = 3;
   UserMessage user = 4;
+  string post_id = 5;
 
   google.protobuf.Timestamp updated_at = 98;
   google.protobuf.Timestamp created_at = 99;

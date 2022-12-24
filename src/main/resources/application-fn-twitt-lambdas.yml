@@ -3,16 +3,13 @@ spring:
     name: "twitt"
   cloud.stream:
     function:
-      definition: convertPostCdcToPostMessage;commentUserJoiner;materializeEnrichedComment;joinPost;
+      definition: convertPostCdcToPostMessage;commentUserJoiner;materializeEnrichedComment;joinPost;updatePostCommentCount;joinPostWithUser;materializeEnrichedPost;
 
     bindings:
       # Post Transformer
       convertPostCdcToPostMessage-in-0:
         destination: post-created
       convertPostCdcToPostMessage-out-0:
-        destination: post-transformed
-      # Post Joiner
-      joinPost-in-0:
         destination: post-transformed
       # Comment User Joiner
       commentUserJoiner-in-0:
@@ -24,6 +21,28 @@ spring:
       # Joined Comment Materialize
       materializeEnrichedComment-in-0:
         destination: comment-user-joined
+      # Post Comment Count Update
+      updatePostCommentCount-in-0:
+        destination: comment-user-joined
+
+      # Join Post User
+      joinPostWithUser-in-0:
+        destination: post-transformed
+      joinPostWithUser-in-1:
+        destination: user-updated
+      joinPostWithUser-out-0:
+        destination: post-user-joined
+      # Post Joiner
+      joinPost-in-0:
+        destination: comment-user-joined
+      joinPost-in-1:
+        destination: post-user-joined
+      joinPost-out-0:
+        destination: post-joined
+
+      # Joined Post Materialize
+      materializeEnrichedPost-in-0:
+        destination: post-joined
 
     kafka:
       streams:
@@ -46,10 +65,17 @@ spring:
               application-id: "convertPostCdcToPostMessage"
             joinPost:
               application-id: "joinPost"
+            joinPostWithUser:
+              application-id: "joinPostWithUser"
             commentUserJoiner:
               application-id: "commentUserJoiner"
             materializeEnrichedComment:
               application-id: "materializeEnrichedComment"
+            updatePostCommentCount-in-0:
+              application-id: "updatePostCommentCount"
+            materializeEnrichedPost:
+              application-id: "materializeEnrichedPost"
+
           brokers: localhost:9092
           configuration:
             processing:

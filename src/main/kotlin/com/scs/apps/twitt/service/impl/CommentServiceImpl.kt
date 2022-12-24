@@ -28,11 +28,12 @@ class CommentServiceImpl(
             .setId(uuid)
             .build()
 
-        val (comment) = createCommentRequestDto
+        val (comment, postId) = createCommentRequestDto
         val commentMessage: CommentMessage = CommentMessage.newBuilder()
             .setId(userId)
             .setUserId(userId)
             .setComment(comment)
+            .setPostId(postId)
             .setUpdatedAt(createdAt)
             .build()
 

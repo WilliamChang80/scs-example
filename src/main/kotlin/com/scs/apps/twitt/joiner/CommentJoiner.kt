@@ -14,7 +14,7 @@ class CommentJoiner {
     fun joinCommentWithUser(comment: CommentMessage, user: UserMessage?): EnrichedCommentMessage {
         logger.info("joining commentMessage $comment with user message $user")
         val enrichedCommentBuilder: EnrichedCommentMessage.Builder =
-            EnrichedCommentMessage.newBuilder().setComment(comment.comment).setId(comment.id)
+            EnrichedCommentMessage.newBuilder().setComment(comment.comment).setId(comment.id).setPostId(comment.postId)
                 .setCreatedAt(comment.createdAt).setUpdatedAt(comment.updatedAt)
 
         if (user != null) {
