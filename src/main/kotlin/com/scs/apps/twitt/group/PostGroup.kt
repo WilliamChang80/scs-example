@@ -23,12 +23,16 @@ class PostGroup(private val enrichedPostSerde: EnrichedPostSerde) {
     }
 
     private fun groupedSerde(): Grouped<EnrichedPostKey, EnrichedPostMessage> {
-        return Grouped.with("post-group-by", enrichedPostSerde.enrichedPostKeySerde(),
-            enrichedPostSerde.enrichedPostMessageSerde())
+        return Grouped.with(
+            "post-group-by", enrichedPostSerde.enrichedPostKeySerde(),
+            enrichedPostSerde.enrichedPostMessageSerde()
+        )
     }
 
     fun cogroupAggregator(
-        enrichedPostKey: EnrichedPostKey, postMessageWithUser: EnrichedPostMessage, enrichedPostMessage: EnrichedPostMessage
+        enrichedPostKey: EnrichedPostKey,
+        postMessageWithUser: EnrichedPostMessage,
+        enrichedPostMessage: EnrichedPostMessage
     ): EnrichedPostMessage {
         enrichedPostMessage.toBuilder().setId(postMessageWithUser.id).setContent(postMessageWithUser.content)
             .setCreatedAt(postMessageWithUser.createdAt)

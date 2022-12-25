@@ -27,7 +27,7 @@ class StreamConfig {
         return StreamsUncaughtExceptionHandler { e: Throwable ->
             run {
                 logger.error(e.message)
-                StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_APPLICATION;
+                StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_APPLICATION
             }
         }
     }

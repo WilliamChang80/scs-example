@@ -14,6 +14,7 @@ import org.apache.kafka.streams.*
 import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.test.TestRecord
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
@@ -65,6 +66,11 @@ class PostTransformerFunctionTest {
             postSerde.postKeySerde().deserializer(),
             postSerde.postMessageSerde().deserializer()
         )
+    }
+
+    @AfterEach
+    fun cleanup() {
+        topologyTestDriver.close()
     }
 
     @Test

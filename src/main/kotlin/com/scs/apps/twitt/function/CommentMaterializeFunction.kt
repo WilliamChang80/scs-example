@@ -1,6 +1,5 @@
 package com.scs.apps.twitt.function
 
-import com.scs.apps.twitt.UserKey
 import com.scs.apps.twitt.constant.EnrichedCommentKStream
 import com.scs.apps.twitt.constant.PostKStream
 import mu.KotlinLogging

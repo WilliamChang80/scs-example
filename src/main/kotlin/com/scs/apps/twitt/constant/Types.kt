@@ -1,8 +1,8 @@
 package com.scs.apps.twitt.constant
 
 import com.scs.apps.twitt.*
-import com.scs.apps.twitt.Comment.CommentMessage
 import com.scs.apps.twitt.Comment.CommentKey
+import com.scs.apps.twitt.Comment.CommentMessage
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.KTable
 

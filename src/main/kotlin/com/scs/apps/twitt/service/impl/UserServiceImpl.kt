@@ -8,16 +8,18 @@ import com.scs.apps.twitt.dto.RequestDto
 import com.scs.apps.twitt.producer.StreamsProducer
 import com.scs.apps.twitt.serde.UserSerde
 import com.scs.apps.twitt.service.UserService
+import com.scs.apps.twitt.utils.DateTimeUtils
 import org.apache.kafka.streams.KeyValue
 import org.springframework.stereotype.Service
-import java.time.Instant
 
 @Service
-class UserServiceImpl(private val streamsProducer: StreamsProducer, private val userSerde: UserSerde) : UserService {
+class UserServiceImpl(
+    private val streamsProducer: StreamsProducer, private val userSerde: UserSerde,
+    private val dateTimeUtils: DateTimeUtils
+) : UserService {
 
     override fun updateUser(updateUserRequestDto: RequestDto.UpdateUserRequestDto, userId: String) {
-        val now = Instant.now()
-        val createdAt = Timestamp.newBuilder().setSeconds(now.epochSecond).setNanos(now.nano).build()
+        val createdAt: Timestamp = dateTimeUtils.now()
 
         val userKey: UserKey = UserKey.newBuilder()
             .setId(userId)

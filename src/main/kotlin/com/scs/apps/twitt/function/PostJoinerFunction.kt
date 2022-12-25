@@ -8,7 +8,9 @@ import com.scs.apps.twitt.joiner.PostJoiner
 import com.scs.apps.twitt.serde.EnrichedPostSerde
 import mu.KotlinLogging
 import org.apache.kafka.common.utils.Bytes
-import org.apache.kafka.streams.kstream.*
+import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.kstream.Named
+import org.apache.kafka.streams.kstream.TableJoined
 import org.apache.kafka.streams.state.KeyValueStore
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,21 +30,21 @@ class PostJoinerFunction(
         return Function { enrichedComment: EnrichedCommentKStream ->
             return@Function Function { enrichedPost: EnrichedPostKStream ->
                 enrichedPost.groupByKey()
-                    .cogroup { k: EnrichedPostKey, v: EnrichedPostMessage, r: EnrichedPostMessage ->
-                        postGroup.cogroupAggregator(k, v, r)
+                    .cogroup { key: EnrichedPostKey, value: EnrichedPostMessage, result: EnrichedPostMessage ->
+                        postGroup.cogroupAggregator(key, value, result)
                     }
                     .cogroup(
                         commentGroup.group(enrichedComment)
-                    ) { k: EnrichedPostKey, v: EnrichedCommentMessage, r: EnrichedPostMessage ->
+                    ) { key: EnrichedPostKey, value: EnrichedCommentMessage, result: EnrichedPostMessage ->
                         commentGroup.cogroupAggregator(
-                            k,
-                            v,
-                            r
+                            key,
+                            value,
+                            result
                         )
                     }
                     .aggregate({ initializeEnrichedPostMessage() }, materializedSerde())
                     .toStream()
-                    .peek { key, value -> logger.info("joined enriched post with key $key and value $value")}
+                    .peek { key, value -> logger.info("joined enriched post with key $key and value $value") }
             }
         }
     }

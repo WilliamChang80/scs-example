@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(private val userService: UserService) {
 
     @PutMapping("user")
-    fun createPost(@RequestBody updateUserRequestDto: RequestDto.UpdateUserRequestDto,
-                   @RequestHeader(HeaderConstant.HEADER_USER_ID) userId: String) {
+    fun createPost(
+        @RequestBody updateUserRequestDto: RequestDto.UpdateUserRequestDto,
+        @RequestHeader(HeaderConstant.HEADER_USER_ID) userId: String
+    ) {
         userService.updateUser(updateUserRequestDto, userId)
     }
 }

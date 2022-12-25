@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class TwittApplication
 
 fun main(args: Array<String>) {
-	runApplication<TwittApplication>(*args)
+    runApplication<TwittApplication>(*args)
 }

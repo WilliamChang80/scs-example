@@ -4,7 +4,6 @@ import com.scs.apps.twitt.Comment.CommentMessage
 import com.scs.apps.twitt.EnrichedCommentMessage
 import com.scs.apps.twitt.UserMessage
 import mu.KotlinLogging
-import org.apache.kafka.streams.kstream.ValueJoiner
 import org.springframework.stereotype.Component
 
 @Component

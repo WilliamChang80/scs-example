@@ -13,6 +13,7 @@ import com.scs.apps.twitt.constant.UserKTable
 import com.scs.apps.twitt.joiner.CommentJoiner
 import com.scs.apps.twitt.serde.CommentSerde
 import com.scs.apps.twitt.serde.EnrichedCommentSerde
+import com.scs.apps.twitt.serde.PostSerde
 import com.scs.apps.twitt.serde.UserSerde
 import org.apache.kafka.streams.*
 import org.apache.kafka.streams.kstream.Consumed
@@ -43,6 +44,9 @@ class CommentCombinerFunctionTest {
 
     @SpyBean
     lateinit var enrichedCommentSerde: EnrichedCommentSerde
+
+    @SpyBean
+    lateinit var postSerde: PostSerde
 
     @SpyBean
     lateinit var userSerde: UserSerde
@@ -104,7 +108,7 @@ class CommentCombinerFunctionTest {
     }
 
     @AfterEach
-    fun tearDown() {
+    fun cleanup() {
         topologyTestDriver.close()
     }
 
@@ -118,8 +122,6 @@ class CommentCombinerFunctionTest {
         assertFalse(joinedCommentTopic.isEmpty)
 
         val expected: List<KeyValue<EnrichedCommentKey, EnrichedCommentMessage>> = listOf(
-            KeyValue.pair(createEnrichedCommentKey("1"), createEnrichedCommentMessage("id")),
-            KeyValue.pair(createEnrichedCommentKey("2"), createEnrichedCommentMessage("id")),
             KeyValue.pair(createEnrichedCommentKey("1"), createEnrichedCommentMessage("id")),
             KeyValue.pair(createEnrichedCommentKey("2"), createEnrichedCommentMessage("id")),
         )

@@ -13,9 +13,14 @@ import org.springframework.stereotype.Component
 class PostJoiner(private val postSerde: PostSerde, private val enrichedPostSerde: EnrichedPostSerde) {
     private val logger = KotlinLogging.logger {}
 
-    fun joinPostWithUser(comment: PostMessage, user: UserMessage?): EnrichedPostMessage {
-        logger.info("joining postMessage $comment with user message $user")
+    fun joinPostWithUser(post: PostMessage, user: UserMessage?): EnrichedPostMessage {
+        logger.info("joining postMessage $post with user message $user")
         val enrichedPostBuilder: EnrichedPostMessage.Builder = EnrichedPostMessage.newBuilder()
+            .setId(post.id)
+            .setContent(post.content)
+            .setTitle(post.title)
+            .setCreatedAt(post.createdAt)
+            .setUpdatedAt(post.updatedAt)
 
         if (user != null) {
             enrichedPostBuilder.creatorId = user.id

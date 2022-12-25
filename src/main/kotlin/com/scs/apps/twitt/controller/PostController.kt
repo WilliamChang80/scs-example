@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController
 class PostController(private val postService: PostService) {
 
     @PostMapping("post")
-    fun createPost(@RequestBody createPostRequestDto: RequestDto.CreatePostRequestDto,
-                   @RequestHeader(HeaderConstant.HEADER_USER_ID) userId: String) {
+    fun createPost(
+        @RequestBody createPostRequestDto: RequestDto.CreatePostRequestDto,
+        @RequestHeader(HeaderConstant.HEADER_USER_ID) userId: String
+    ) {
         postService.createPost(createPostRequestDto, userId)
     }
 }

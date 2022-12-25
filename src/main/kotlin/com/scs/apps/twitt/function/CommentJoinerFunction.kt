@@ -12,9 +12,10 @@ import com.scs.apps.twitt.serde.CommentSerde
 import com.scs.apps.twitt.serde.EnrichedCommentSerde
 import com.scs.apps.twitt.serde.PostSerde
 import mu.KotlinLogging
-import org.apache.kafka.common.utils.Bytes
-import org.apache.kafka.streams.kstream.*
-import org.apache.kafka.streams.state.KeyValueStore
+import org.apache.kafka.streams.kstream.Grouped
+import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.kstream.Named
+import org.apache.kafka.streams.kstream.TableJoined
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.function.BiFunction

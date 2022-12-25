@@ -1,13 +1,13 @@
 package com.scs.apps.twitt.group
 
-import com.scs.apps.twitt.*
-import com.scs.apps.twitt.constant.CommentKStream
+import com.scs.apps.twitt.EnrichedCommentMessage
+import com.scs.apps.twitt.EnrichedPostKey
+import com.scs.apps.twitt.EnrichedPostMessage
 import com.scs.apps.twitt.constant.EnrichedCommentKStream
 import com.scs.apps.twitt.serde.EnrichedCommentSerde
 import com.scs.apps.twitt.serde.EnrichedPostSerde
 import org.apache.kafka.streams.kstream.Grouped
 import org.apache.kafka.streams.kstream.KGroupedStream
-import org.apache.kafka.streams.kstream.KeyValueMapper
 import org.springframework.stereotype.Component
 
 @Component
