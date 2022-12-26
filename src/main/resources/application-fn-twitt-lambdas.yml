@@ -75,7 +75,7 @@ spring:
               application-id: "commentUserJoiner"
             materializeEnrichedComment:
               application-id: "materializeEnrichedComment"
-            updatePostCommentCount-in-0:
+            updatePostCommentCount:
               application-id: "updatePostCommentCount"
             materializeEnrichedPost:
               application-id: "materializeEnrichedPost"

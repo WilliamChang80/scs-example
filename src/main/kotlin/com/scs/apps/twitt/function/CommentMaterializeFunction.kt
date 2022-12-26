@@ -12,9 +12,9 @@ class CommentMaterializeFunction {
 
     private val logger = KotlinLogging.logger {}
 
-    @Bean
-    fun materializeEnrichedComment(): Function<PostKStream, EnrichedCommentKStream> {
-        TODO("Implement later")
-    }
+//    @Bean
+//    fun materializeEnrichedComment(): Function<PostKStream, EnrichedCommentKStream> {
+//        TODO("Implement later")
+//    }
 
 }

@@ -34,13 +34,6 @@ class PostGroup(private val enrichedPostSerde: EnrichedPostSerde) {
         postMessageWithUser: EnrichedPostMessage,
         enrichedPostMessage: EnrichedPostMessage
     ): EnrichedPostMessage {
-        enrichedPostMessage.toBuilder().setId(postMessageWithUser.id).setContent(postMessageWithUser.content)
-            .setCreatedAt(postMessageWithUser.createdAt)
-            .setUpdatedAt(postMessageWithUser.updatedAt)
-            .setTitle(postMessageWithUser.title)
-            .setUser(postMessageWithUser.user)
-            .build()
-
-        return enrichedPostMessage
+        return postMessageWithUser
     }
 }

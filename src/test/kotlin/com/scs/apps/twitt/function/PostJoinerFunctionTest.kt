@@ -14,8 +14,7 @@ import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.test.TestRecord
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -41,7 +40,7 @@ class PostJoinerFunctionTest {
     @SpyBean
     lateinit var enrichedCommentSerde: EnrichedCommentSerde
 
-    @MockBean
+    @SpyBean
     lateinit var postGroup: PostGroup
 
     @SpyBean
@@ -106,28 +105,58 @@ class PostJoinerFunctionTest {
     @Test
     fun testJoinPost() {
         `when`(postJoiner.foreignKeyExtractor(anyOrNull())).thenReturn(UserKey.newBuilder().build())
-        `when`(postGroup.cogroupAggregator(anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(
-            createEnrichedPostMessage(false, isWithUser = true)
+
+        postUserJoinedTopic.pipeInput(
+            TestRecord(
+                createEnrichedPostKey(), createEnrichedPostMessage(emptyList())
+            )
         )
 
         enrichedCommentTopic.pipeInput(
             TestRecord(
-                createEnrichedCommentKey(), createEnrichedCommentMessage()
+                createEnrichedCommentKey(), createEnrichedCommentMessage("comment 1", "commentId1")
             )
         )
-        postUserJoinedTopic.pipeInput(
+
+        enrichedCommentTopic.pipeInput(
             TestRecord(
-                createEnrichedPostKey(), createEnrichedPostMessage(false, isWithUser = false)
+                createEnrichedCommentKey(), createEnrichedCommentMessage("comment 2", "commentId2")
             )
         )
 
         assertFalse(enrichedPostTopic.isEmpty)
 
-        val actual: KeyValue<EnrichedPostKey, EnrichedPostMessage> = enrichedPostTopic.readKeyValue()
-        val expected: KeyValue<EnrichedPostKey, EnrichedPostMessage> = KeyValue.pair(
-            createEnrichedPostKey(), createEnrichedPostMessage(true, isWithUser = true)
+        val results: MutableList<KeyValue<EnrichedPostKey, EnrichedPostMessage>> =
+            enrichedPostTopic.readKeyValuesToList()
+        val regularPostMessage: KeyValue<EnrichedPostKey, EnrichedPostMessage> = results[0]
+        assertEquals(
+            regularPostMessage, KeyValue.pair(
+                createEnrichedPostKey(),
+                createEnrichedPostMessage(emptyList())
+            )
         )
 
+        val postWithFirstCommentMessage: KeyValue<EnrichedPostKey, EnrichedPostMessage> = results[1]
+        assertEquals(
+            postWithFirstCommentMessage, KeyValue.pair(
+                createEnrichedPostKey(),
+                createEnrichedPostMessage(listOf(createEnrichedCommentMessage("comment 1", "commentId1")))
+            )
+        )
+
+        val expected: KeyValue<EnrichedPostKey, EnrichedPostMessage> = KeyValue.pair(
+            createEnrichedPostKey(),
+            createEnrichedPostMessage(
+                listOf(
+                    createEnrichedCommentMessage("comment 1", "commentId1"),
+                    createEnrichedCommentMessage("comment 2", "commentId2")
+                )
+            )
+        )
+
+        val actual: KeyValue<EnrichedPostKey, EnrichedPostMessage> = results[results.size - 1]
+
+        assertNotNull(actual)
         assertEquals(expected, actual)
     }
 
@@ -139,22 +168,17 @@ class PostJoinerFunctionTest {
         return EnrichedPostKey.newBuilder().setId("postId").build()
     }
 
-    private fun createEnrichedCommentMessage(): EnrichedCommentMessage {
-        return EnrichedCommentMessage.newBuilder().setComment("comment").setId("commentId").setUserId("userId")
+    private fun createEnrichedCommentMessage(comment: String, id: String): EnrichedCommentMessage {
+        return EnrichedCommentMessage.newBuilder().setComment(comment).setId(id).setUserId("userId")
             .setUser(createUserMessage()).setPostId("postId").setUser(createUserMessage()).build()
     }
 
-    private fun createEnrichedPostMessage(isCommentsAdded: Boolean, isWithUser: Boolean): EnrichedPostMessage {
+    private fun createEnrichedPostMessage(
+        comments: List<EnrichedCommentMessage>
+    ): EnrichedPostMessage {
         val builder: EnrichedPostMessage.Builder = EnrichedPostMessage.newBuilder().setId("postId").setTitle("title")
-            .setContent("content")
-        if (isCommentsAdded) {
-            builder.addComments(createEnrichedCommentMessage())
-        }
-
-        if (isWithUser) {
-            builder.creatorId = "userId"
-            builder.user = createUserMessage()
-        }
+            .setContent("content").setCreatorId("userId").setUser(createUserMessage())
+        builder.addAllComments(comments)
 
         return builder.build()
     }

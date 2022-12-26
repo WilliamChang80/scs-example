@@ -15,9 +15,8 @@ message PostMessage {
   string content = 2;
   float rating = 3;
   bool is_deleted = 4;
-  string user_id = 5;
-  string title = 6;
-  string creator_id = 7;
+  string title = 5;
+  string creator_id = 6;
 
   google.protobuf.Timestamp created_at = 98;
   google.protobuf.Timestamp updated_at = 99;

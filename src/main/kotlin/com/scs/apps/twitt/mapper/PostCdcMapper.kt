@@ -14,9 +14,14 @@ class PostCdcMapper : KeyValueMapper<PostCdcKey, PostCdcMessage, KeyValue<PostKe
     override fun apply(key: PostCdcKey, value: PostCdcMessage): KeyValue<PostKey, PostMessage> {
         return KeyValue.pair(
             PostKey.newBuilder().setId(key.id).build(),
-            PostMessage.newBuilder().setId(value.id).setRating(value.rating).setContent(value.content)
+            PostMessage.newBuilder()
+                .setId(value.id)
+                .setRating(value.rating)
+                .setContent(value.content)
+                .setCreatorId(value.creatorId)
                 .setIsDeleted(value.isDeleted)
-                .setCreatedAt(value.createdAt).build()
+                .setCreatedAt(value.createdAt)
+                .setUpdatedAt(value.updatedAt).build()
         )
     }
 }
