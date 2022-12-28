@@ -9,4 +9,13 @@ spring:
           configuration:
             processing:
               guarantee: exactly_once
+  datasource:
+    username: postgres
+    password: password
+    url: jdbc:postgresql://localhost:5432/twitt
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
 bootstrap-servers: localhost:9092
