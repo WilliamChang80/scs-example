@@ -1,9 +1,9 @@
 package com.scs.apps.twitt.service.impl
 
-import com.google.protobuf.Timestamp
 import com.scs.apps.twitt.PostCdcKey
 import com.scs.apps.twitt.PostCdcMessage
 import com.scs.apps.twitt.constant.KafkaTopic
+import com.scs.apps.twitt.converter.PostConverter
 import com.scs.apps.twitt.dto.RequestDto
 import com.scs.apps.twitt.entity.Author
 import com.scs.apps.twitt.entity.Post
@@ -13,7 +13,6 @@ import com.scs.apps.twitt.repository.AuthorJPARepository
 import com.scs.apps.twitt.repository.PostJPARepository
 import com.scs.apps.twitt.serde.PostCdcSerde
 import com.scs.apps.twitt.service.PostService
-import com.scs.apps.twitt.utils.DateTimeUtils
 import org.apache.kafka.streams.KeyValue
 import org.springframework.stereotype.Service
 import java.util.*
@@ -23,7 +22,7 @@ import java.util.*
 class PostServiceImpl(
     private val streamsProducer: StreamsProducer, private val postCdcSerde: PostCdcSerde,
     private val authorRepository: AuthorJPARepository, private val postRepository: PostJPARepository,
-    private val dateTimeUtils: DateTimeUtils
+    private val postConverter: PostConverter
 ) : PostService {
 
     override fun createPost(createPostRequestDto: RequestDto.CreatePostRequestDto, userId: String) {
@@ -40,23 +39,10 @@ class PostServiceImpl(
     }
 
     private fun publishChangedPost(post: Post) {
-        val messageKey: PostCdcKey = PostCdcKey.newBuilder()
-            .setId(post.id.toString())
-            .build()
-
-        val createdAt: Timestamp? = post.createdAt?.let { dateTimeUtils.parseToTimestamp(it) }
-        val message: PostCdcMessage = PostCdcMessage.newBuilder()
-            .setId(post.id.toString())
-            .setCreatorId(post.creator?.id.toString())
-            .setCreatedAt(createdAt)
-            .setUpdatedAt(createdAt)
-            .setContent(post.content)
-            .setTitle(post.title)
-            .setIsDeleted(false)
-            .build()
+        val message: KeyValue<PostCdcKey, PostCdcMessage> = postConverter.toPostCdcMessage(post)
 
         streamsProducer.publish(
-            KafkaTopic.POST_CREATED_TOPIC, KeyValue.pair(messageKey, message), postCdcSerde.postCdcKeySerde(),
+            KafkaTopic.POST_CREATED_TOPIC, message, postCdcSerde.postCdcKeySerde(),
             postCdcSerde.postCdcMessageSerde()
         )
     }

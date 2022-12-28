@@ -3,6 +3,7 @@ package com.scs.apps.twitt.service
 import com.google.protobuf.Timestamp
 import com.scs.apps.twitt.PostCdcKey
 import com.scs.apps.twitt.PostCdcMessage
+import com.scs.apps.twitt.converter.PostConverter
 import com.scs.apps.twitt.dto.RequestDto
 import com.scs.apps.twitt.entity.Author
 import com.scs.apps.twitt.entity.Post
@@ -52,6 +53,9 @@ class PostServiceTest {
     @MockBean
     lateinit var authorRepository: AuthorJPARepository
 
+    @MockBean
+    lateinit var postConverter: PostConverter
+
     @SpyBean
     lateinit var postCdcSerde: PostCdcSerde
 
@@ -79,6 +83,8 @@ class PostServiceTest {
         updatedPost.createdAt = nowZdt
         updatedPost.updatedAt = nowZdt
 
+        `when`(postConverter.toPostCdcMessage(updatedPost)).thenReturn(
+            KeyValue.pair(PostCdcKey.newBuilder().build(), PostCdcMessage.newBuilder().build()))
         `when`(postRepository.save(postCaptor.capture())).thenReturn(updatedPost)
         `when`(dateTimeUtils.parseToTimestamp(nowZdt)).thenReturn(nowTimestamp)
 
@@ -90,27 +96,14 @@ class PostServiceTest {
         val post = Post(title = "title", content = "content", creator = author)
         assertThat(postCaptor.value).usingRecursiveComparison().isEqualTo(post)
 
-        val key: PostCdcKey = PostCdcKey.newBuilder()
-            .setId("8a3aa38d-b365-4ef7-a2db-fcf5afcb70f2")
-            .build()
-
-        val message: PostCdcMessage = PostCdcMessage.newBuilder().setId("8a3aa38d-b365-4ef7-a2db-fcf5afcb70f2")
-            .setCreatorId("f661044e-398b-4079-92f9-e3c2134aec5d")
-            .setCreatedAt(nowTimestamp)
-            .setUpdatedAt(nowTimestamp)
-            .setContent("content")
-            .setTitle("title")
-            .setIsDeleted(false)
-            .build()
-
         verify(streamsProducer).publish(
             anyString(), capture(keyValueCaptor),
             any<ProtobufSerde<PostCdcKey>>(),
             any<ProtobufSerde<PostCdcMessage>>()
         )
 
-        assertEquals(key, keyValueCaptor.value.key)
-        assertEquals(message, keyValueCaptor.value.value)
+        assertEquals(PostCdcKey.newBuilder().build(), keyValueCaptor.value.key)
+        assertEquals(PostCdcMessage.newBuilder().build(), keyValueCaptor.value.value)
     }
 
     @Test

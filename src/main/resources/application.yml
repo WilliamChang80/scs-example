@@ -15,7 +15,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/twitt
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
 bootstrap-servers: localhost:9092

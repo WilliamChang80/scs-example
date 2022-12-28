@@ -23,5 +23,5 @@ open class Post(
     open val creator: Author? = null,
 
     @OneToMany
-    open val comments: MutableSet<Comment> = mutableSetOf()
+    open val comments: List<Comment> = emptyList()
 ) : BaseEntity()
