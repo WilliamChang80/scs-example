@@ -18,6 +18,9 @@ open class Post(
     open val rating: Double = 0.0,
     open val isDeleted: Boolean = false,
     open val title: String = "",
+    open val views: Long = 0,
+    open val likes: Int = 0,
+    open val dislikes: Int = 0,
 
     @OneToOne
     open val creator: Author? = null,

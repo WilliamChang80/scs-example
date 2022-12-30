@@ -8,4 +8,6 @@ object KafkaTopic {
     const val USER_UPDATED_TOPIC = "user-updated"
     const val POST_USER_JOINED_TOPIC = "post-user-joined"
     const val POST_JOINED = "post-joined"
+    const val ACTIVITY_UPDATED = "activity-updated"
+    const val ACTIVITY_AGGREGATED = "activity-aggregated"
 }

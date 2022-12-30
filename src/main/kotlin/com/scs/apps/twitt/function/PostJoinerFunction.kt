@@ -2,6 +2,7 @@ package com.scs.apps.twitt.function
 
 import com.scs.apps.twitt.*
 import com.scs.apps.twitt.constant.*
+import com.scs.apps.twitt.group.ActivityGroup
 import com.scs.apps.twitt.group.CommentGroup
 import com.scs.apps.twitt.group.PostGroup
 import com.scs.apps.twitt.joiner.PostJoiner
@@ -20,31 +21,42 @@ import java.util.function.Function
 @Configuration
 class PostJoinerFunction(
     private val enrichedPostSerde: EnrichedPostSerde, private val commentGroup: CommentGroup,
-    private val postGroup: PostGroup, private val postJoiner: PostJoiner
+    private val postGroup: PostGroup, private val postJoiner: PostJoiner, private val activityGroup: ActivityGroup
 ) {
 
     private val logger = KotlinLogging.logger {}
 
     @Bean
-    fun joinPost(): Function<EnrichedCommentKStream, Function<EnrichedPostKStream, EnrichedPostKStream>> {
+    fun joinPost(): Function<EnrichedCommentKStream, Function<AggregatedActivityKStream, Function<EnrichedPostKStream, EnrichedPostKStream>>> {
         return Function { enrichedComment: EnrichedCommentKStream ->
-            return@Function Function { enrichedPost: EnrichedPostKStream ->
-                enrichedPost.groupByKey()
-                    .cogroup { key: EnrichedPostKey, value: EnrichedPostMessage, result: EnrichedPostMessage ->
-                        postGroup.cogroupAggregator(key, value, result)
-                    }
-                    .cogroup(
-                        commentGroup.group(enrichedComment)
-                    ) { key: EnrichedPostKey, value: EnrichedCommentMessage, result: EnrichedPostMessage ->
-                        commentGroup.cogroupAggregator(
-                            key,
-                            value,
-                            result
-                        )
-                    }
-                    .aggregate({ initializeEnrichedPostMessage() }, materializedSerde())
-                    .toStream()
-                    .peek { key, value -> logger.info("joined enriched post with key $key and value $value") }
+            return@Function Function activity@{ aggregatedActivity: AggregatedActivityKStream ->
+                return@activity Function { enrichedPost: EnrichedPostKStream ->
+                    enrichedPost.groupByKey()
+                        .cogroup { key: EnrichedPostKey, value: EnrichedPostMessage, result: EnrichedPostMessage ->
+                            postGroup.cogroupAggregator(key, value, result)
+                        }
+                        .cogroup(
+                            commentGroup.group(enrichedComment)
+                        ) { key: EnrichedPostKey, value: EnrichedCommentMessage, result: EnrichedPostMessage ->
+                            commentGroup.cogroupAggregator(
+                                key,
+                                value,
+                                result
+                            )
+                        }
+                        .cogroup(
+                            activityGroup.group(aggregatedActivity)
+                        ) { key: EnrichedPostKey, value: AggregatedActivityMessage, result: EnrichedPostMessage ->
+                            activityGroup.cogroupAggregator(
+                                key,
+                                value,
+                                result
+                            )
+                        }
+                        .aggregate({ initializeEnrichedPostMessage() }, materializedSerde())
+                        .toStream()
+                        .peek { key, value -> logger.info("joined enriched post with key $key and value $value") }
+                }
             }
         }
     }

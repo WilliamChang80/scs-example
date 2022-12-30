@@ -23,7 +23,9 @@ message EnrichedPostMessage {
   string creator_id = 7;
   UserMessage user = 8;
   repeated EnrichedCommentMessage comments = 9;
-  ActivityMessage activity = 10;
+  int32 likes = 10;
+  int32 dislikes = 11;
+  int64 views = 12;
 
   google.protobuf.Timestamp created_at = 98;
   google.protobuf.Timestamp updated_at = 99;

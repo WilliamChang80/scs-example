@@ -25,7 +25,8 @@ class PostConverter(private val commentConverter: CommentConverter, private val 
         val post = Post(
             title = enrichedPostMessage.title, content = enrichedPostMessage.content,
             isDeleted = enrichedPostMessage.isDeleted, rating = enrichedPostMessage.rating.toDouble(),
-            creator = user, comments = comments
+            creator = user, comments = comments, dislikes = enrichedPostMessage.dislikes,
+            likes = enrichedPostMessage.likes, views = enrichedPostMessage.views
         )
         post.id = UUID.fromString(enrichedPostMessage.id)
         post.createdAt = dateTimeUtils.parseToZdt(enrichedPostMessage.createdAt)

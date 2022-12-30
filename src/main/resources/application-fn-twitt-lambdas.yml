@@ -3,7 +3,7 @@ spring:
     name: "twitt"
   cloud.stream:
     function:
-      definition: convertPostCdcToPostMessage;commentUserJoiner;joinPost;updatePostCommentCount;joinPostWithUser;materializeEnrichedPost;
+      definition: convertPostCdcToPostMessage;commentUserJoiner;joinPost;updatePostCommentCount;joinPostWithUser;materializeEnrichedPost;aggregateActivities;
 
     bindings:
       # Post Transformer
@@ -36,6 +36,8 @@ spring:
       joinPost-in-0:
         destination: comment-user-joined
       joinPost-in-1:
+        destination: activity-aggregated
+      joinPost-in-2:
         destination: post-user-joined
       joinPost-out-0:
         destination: post-joined
@@ -43,6 +45,12 @@ spring:
       # Joined Post Materialize
       materializeEnrichedPost-in-0:
         destination: post-joined
+
+      # Aggregate activities
+      aggregateActivities-in-0:
+        destination: activity-updated
+      aggregateActivities-out-0:
+        destination: activity-aggregated
 
     kafka:
       streams:
@@ -73,6 +81,8 @@ spring:
               application-id: "updatePostCommentCount"
             materializeEnrichedPost:
               application-id: "materializeEnrichedPost"
+            aggregateActivities:
+              application-id: "aggregateActivities"
 
           brokers: localhost:9092
           configuration:
