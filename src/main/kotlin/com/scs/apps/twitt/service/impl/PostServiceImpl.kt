@@ -14,6 +14,7 @@ import com.scs.apps.twitt.serde.ActivitySerde
 import com.scs.apps.twitt.serde.PostCdcSerde
 import com.scs.apps.twitt.service.PostService
 import com.scs.apps.twitt.utils.DateTimeUtils
+import com.scs.apps.twitt.utils.UuidUtils
 import org.apache.kafka.streams.KeyValue
 import org.springframework.stereotype.Service
 import java.util.*
@@ -24,7 +25,7 @@ class PostServiceImpl(
     private val streamsProducer: StreamsProducer, private val postCdcSerde: PostCdcSerde,
     private val authorRepository: AuthorJPARepository, private val postRepository: PostJPARepository,
     private val postConverter: PostConverter, private val activitySerde: ActivitySerde,
-    private val dateTimeUtils: DateTimeUtils
+    private val dateTimeUtils: DateTimeUtils, private val uuidUtils: UuidUtils
 ) : PostService {
 
     override fun createPost(createPostRequestDto: RequestDto.CreatePostRequestDto, userId: String) {
@@ -51,7 +52,7 @@ class PostServiceImpl(
     }
 
     private fun publishViewedPost(postId: UUID) {
-        val activityId: String = UUID.randomUUID().toString()
+        val activityId: String = uuidUtils.randomUuid().toString()
         val activityMessage: ActivityMessage = ActivityMessage.newBuilder().setId(activityId)
             .setPostId(postId.toString())
             .setActionType(ActivityActionType.POST_VIEWED)

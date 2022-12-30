@@ -43,8 +43,6 @@ class PostEventServiceTest {
     val nowZdt: ZonedDateTime = ZonedDateTime.now()
 
     fun parametersToTestUpsert(): Stream<Arguments> {
-
-
         return Stream.of(
             Arguments.of(
                 EnrichedPostMessage.newBuilder().setId("390a81fb-39cc-4b81-b944-92972a595ab6")

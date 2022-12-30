@@ -60,7 +60,7 @@ class ActivityAggregateFunction(private val activitySerde: ActivitySerde, privat
         }
 
         // Counted because storing the latest data, can use count/reduce from stream.
-        val rateCounts = aggregate.likes + aggregate.dislikes
+        val rateCounts = builder.likes + builder.dislikes
         if (rateCounts != 0) {
             builder.rate = (builder.likes.toFloat() / rateCounts.toFloat()) * 10
         }

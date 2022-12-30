@@ -1,12 +1,15 @@
 package com.scs.apps.twitt.function
 
 import com.scs.apps.twitt.*
+import com.scs.apps.twitt.constant.AggregatedActivityKStream
 import com.scs.apps.twitt.constant.EnrichedCommentKStream
 import com.scs.apps.twitt.constant.EnrichedPostKStream
 import com.scs.apps.twitt.constant.KafkaTopic
+import com.scs.apps.twitt.group.ActivityGroup
 import com.scs.apps.twitt.group.CommentGroup
 import com.scs.apps.twitt.group.PostGroup
 import com.scs.apps.twitt.joiner.PostJoiner
+import com.scs.apps.twitt.serde.ActivitySerde
 import com.scs.apps.twitt.serde.EnrichedCommentSerde
 import com.scs.apps.twitt.serde.EnrichedPostSerde
 import org.apache.kafka.streams.*
@@ -38,6 +41,9 @@ class PostJoinerFunctionTest {
     lateinit var commentGroup: CommentGroup
 
     @SpyBean
+    lateinit var activityGroup: ActivityGroup
+
+    @SpyBean
     lateinit var enrichedCommentSerde: EnrichedCommentSerde
 
     @SpyBean
@@ -46,9 +52,13 @@ class PostJoinerFunctionTest {
     @SpyBean
     lateinit var enrichedPostSerde: EnrichedPostSerde
 
+    @SpyBean
+    lateinit var activitySerde: ActivitySerde
+
     lateinit var topologyTestDriver: TopologyTestDriver
     lateinit var postUserJoinedTopic: TestInputTopic<EnrichedPostKey, EnrichedPostMessage>
     lateinit var enrichedCommentTopic: TestInputTopic<EnrichedCommentKey, EnrichedCommentMessage>
+    lateinit var aggregatedActivityTopic: TestInputTopic<ActivityKey, AggregatedActivityMessage>
 
     lateinit var enrichedPostTopic: TestOutputTopic<EnrichedPostKey, EnrichedPostMessage>
 
@@ -66,9 +76,15 @@ class PostJoinerFunctionTest {
                 enrichedPostSerde.enrichedPostKeySerde(), enrichedPostSerde.enrichedPostMessageSerde()
             )
         )
+        val aggregatedActivityKStream: AggregatedActivityKStream = streamsBuilder.stream(
+            KafkaTopic.ACTIVITY_AGGREGATED, Consumed.with(
+                activitySerde.activityKeySerde(), activitySerde.aggregatedActivityMessageSerde()
+            )
+        )
 
         val postJoinedKStream: EnrichedPostKStream =
-            postJoinerFunction.joinPost().apply(enrichedCommentKStream).apply(postUserJoinedKStream)
+            postJoinerFunction.joinPost().apply(enrichedCommentKStream).apply(aggregatedActivityKStream)
+                .apply(postUserJoinedKStream)
         postJoinedKStream.to(
             KafkaTopic.POST_JOINED, Produced.with(
                 enrichedPostSerde.enrichedPostKeySerde(), enrichedPostSerde.enrichedPostMessageSerde()
@@ -90,6 +106,12 @@ class PostJoinerFunctionTest {
             enrichedPostSerde.enrichedPostKeySerde().serializer(),
             enrichedPostSerde.enrichedPostMessageSerde().serializer()
         )
+        aggregatedActivityTopic = topologyTestDriver.createInputTopic(
+            KafkaTopic.ACTIVITY_AGGREGATED,
+            activitySerde.activityKeySerde().serializer(),
+            activitySerde.aggregatedActivityMessageSerde().serializer()
+        )
+
         enrichedPostTopic = topologyTestDriver.createOutputTopic(
             KafkaTopic.POST_JOINED,
             enrichedPostSerde.enrichedPostKeySerde().deserializer(),
@@ -124,29 +146,27 @@ class PostJoinerFunctionTest {
             )
         )
 
+        aggregatedActivityTopic.pipeInput(
+            TestRecord(createActivityKey(), createAggregatedActivityMessage(1, 1, 3, 3.0f))
+        )
+
+        aggregatedActivityTopic.pipeInput(
+            TestRecord(createActivityKey(), createAggregatedActivityMessage(2, 2, 4, 1.5f))
+        )
+
         assertFalse(enrichedPostTopic.isEmpty)
 
-        val results: MutableList<KeyValue<EnrichedPostKey, EnrichedPostMessage>> =
-            enrichedPostTopic.readKeyValuesToList()
-        val regularPostMessage: KeyValue<EnrichedPostKey, EnrichedPostMessage> = results[0]
-        assertEquals(
-            regularPostMessage, KeyValue.pair(
-                createEnrichedPostKey(),
-                createEnrichedPostMessage(emptyList())
-            )
+        val regularPostMessage: KeyValue<EnrichedPostKey, EnrichedPostMessage> = KeyValue.pair(
+            createEnrichedPostKey(), createEnrichedPostMessage(emptyList())
         )
 
-        val postWithFirstCommentMessage: KeyValue<EnrichedPostKey, EnrichedPostMessage> = results[1]
-        assertEquals(
-            postWithFirstCommentMessage, KeyValue.pair(
-                createEnrichedPostKey(),
-                createEnrichedPostMessage(listOf(createEnrichedCommentMessage("comment 1", "commentId1")))
-            )
-        )
-
-        val expected: KeyValue<EnrichedPostKey, EnrichedPostMessage> = KeyValue.pair(
+        val postWithFirstCommentMessage = KeyValue.pair(
             createEnrichedPostKey(),
-            createEnrichedPostMessage(
+            createEnrichedPostMessage(listOf(createEnrichedCommentMessage("comment 1", "commentId1")))
+        )
+
+        val postWithSecondCommentMessage: KeyValue<EnrichedPostKey, EnrichedPostMessage> = KeyValue.pair(
+            createEnrichedPostKey(), createEnrichedPostMessage(
                 listOf(
                     createEnrichedCommentMessage("comment 1", "commentId1"),
                     createEnrichedCommentMessage("comment 2", "commentId2")
@@ -154,10 +174,51 @@ class PostJoinerFunctionTest {
             )
         )
 
-        val actual: KeyValue<EnrichedPostKey, EnrichedPostMessage> = results[results.size - 1]
+        val postWithFirstActivityMessage: KeyValue<EnrichedPostKey, EnrichedPostMessage> = KeyValue.pair(
+            createEnrichedPostKey(), createEnrichedPostMessage(
+                listOf(
+                    createEnrichedCommentMessage("comment 1", "commentId1"),
+                    createEnrichedCommentMessage("comment 2", "commentId2")
+                ), 1, 1, 3, 3.0f
+            )
+        )
+
+        val postWithSecondActivityMessage: KeyValue<EnrichedPostKey, EnrichedPostMessage> = KeyValue.pair(
+            createEnrichedPostKey(), createEnrichedPostMessage(
+                listOf(
+                    createEnrichedCommentMessage("comment 1", "commentId1"),
+                    createEnrichedCommentMessage("comment 2", "commentId2")
+                ), 2, 2, 4, 1.5f
+            )
+        )
+
+        val actual: MutableList<KeyValue<EnrichedPostKey, EnrichedPostMessage>> =
+            enrichedPostTopic.readKeyValuesToList()
+
+        val expected: List<KeyValue<EnrichedPostKey, EnrichedPostMessage>> = listOf(
+            regularPostMessage,
+            postWithFirstCommentMessage,
+            postWithSecondCommentMessage,
+            postWithFirstActivityMessage,
+            postWithSecondActivityMessage
+        )
 
         assertNotNull(actual)
-        assertEquals(expected, actual)
+        assertEquals(5, actual.size)
+        assertResults(expected, actual)
+    }
+
+    private fun assertResults(
+        expected: List<KeyValue<EnrichedPostKey, EnrichedPostMessage>>,
+        actual: List<KeyValue<EnrichedPostKey, EnrichedPostMessage>>
+    ) {
+        for (i in expected.indices) {
+            assertEquals(expected[i], actual[i])
+        }
+    }
+
+    private fun createActivityKey(): ActivityKey {
+        return ActivityKey.newBuilder().build()
     }
 
     private fun createEnrichedCommentKey(): EnrichedCommentKey {
@@ -174,10 +235,12 @@ class PostJoinerFunctionTest {
     }
 
     private fun createEnrichedPostMessage(
-        comments: List<EnrichedCommentMessage>
+        comments: List<EnrichedCommentMessage>, views: Long = 0, like: Int = 0, dislike: Int = 0, rating: Float = 0.0f
     ): EnrichedPostMessage {
-        val builder: EnrichedPostMessage.Builder = EnrichedPostMessage.newBuilder().setId("postId").setTitle("title")
-            .setContent("content").setCreatorId("userId").setUser(createUserMessage())
+        val builder: EnrichedPostMessage.Builder =
+            EnrichedPostMessage.newBuilder().setId("postId").setTitle("title").setContent("content")
+                .setCreatorId("userId").setUser(createUserMessage()).setViews(views).setLikes(like).setDislikes(dislike)
+                .setRating(rating)
         builder.addAllComments(comments)
 
         return builder.build()
@@ -185,5 +248,12 @@ class PostJoinerFunctionTest {
 
     private fun createUserMessage(): UserMessage {
         return UserMessage.newBuilder().setId("userId").setName("name").build()
+    }
+
+    private fun createAggregatedActivityMessage(
+        views: Long, like: Int, dislike: Int, rating: Float
+    ): AggregatedActivityMessage {
+        return AggregatedActivityMessage.newBuilder().setPostId("postId").setViews(views).setLikes(like)
+            .setDislikes(dislike).setRate(rating).build()
     }
 }

@@ -15,6 +15,7 @@ import com.scs.apps.twitt.utils.DateTimeUtils
 import com.scs.apps.twitt.utils.UuidUtils
 import org.apache.kafka.streams.KeyValue
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class ActivityServiceImpl(
@@ -26,9 +27,9 @@ class ActivityServiceImpl(
 ) : ActivityService {
 
     override fun ratePost(requestDto: RequestDto.RatePostRequestDto) {
-        val activityId = uuidUtils.randomUuid()
+        val activityId: UUID = uuidUtils.randomUuid()
         val post: Post = postRepository.findById(requestDto.id)
-            .orElseThrow { NotFoundException("Post with id $requestDto.id is not found.") }
+            .orElseThrow { NotFoundException("Post with id ${requestDto.id} is not found.") }
 
         val activityMessage: ActivityMessage = ActivityMessage.newBuilder()
             .setPostId(post.id.toString())

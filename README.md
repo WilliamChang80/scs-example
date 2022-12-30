@@ -24,6 +24,9 @@ graph LR
 
     I[Create or Update User] --> |UserMessage| H[commentUserJoiner]
     I[Create or Update User] --> |UserMessage| C[joinPostWithUser]
+
+    J[Activity Updated] --> |ActivityMessage| K[aggregateActivities]
+    K[aggregateActivities] --> |AggregatedActivityMessage| D[joinPost]
 ```
 
 CDC will capture all the changes on `posts` table and will be materialized by debezium into kafka event
