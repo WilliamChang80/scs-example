@@ -41,9 +41,11 @@ For instance on `joinPost` operation if there's any update user which trigger Us
 1. Docker compose
 2. Gradle 
 3. Kotlin
+4. Java 11
 
 ### Running
 1. Run all the external dependencies by running `docker-compose up -d` and make sure all the containers are ready
 2. Install all the dependencies on gradle and make sure the build is successful by running `./gradlew build`
 3. Run with profile `fn-twitt-lambdas` by using command `./gradlew bootRun --args='--spring.profiles.active=fn-twitt-lambdas'`
-4. Have fun :)
+4. You will be able to connect to elasticsearch on `http://localhost:9200/posts` and postgres on `jdbc:postgresql://localhost:5432/twitt`
+5. Have fun :)
