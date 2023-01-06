@@ -1,0 +1,187 @@
+{
+  "collection": {
+    "info": {
+      "_postman_id": "5c02d6b3-93ae-4c26-92df-31d141a357b6",
+      "name": "scs-example",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "updatedAt": "2023-01-06T09:36:38.000Z"
+    },
+    "item": [
+      {
+        "name": "Create Post",
+        "id": "787effc9-1b19-470c-83fd-dfcd2d118dc4",
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        },
+        "request": {
+          "auth": {
+            "type": "bearer"
+          },
+          "method": "POST",
+          "header": [
+            {
+              "key": "user-id",
+              "value": "62e039d0-0729-4509-bede-9edd1dc4059b",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"title\": \"title 1!\",\r\n    \"content\": \"contentss lorem ipsum\"\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "http://localhost:8080/post",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "post"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Rate post",
+        "id": "d8efcb66-5c4a-4e23-89f2-9abccf22f44d",
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        },
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"id\": \"e14881eb-6cec-4ab2-a200-9666cb74d2d6\",\n    \"type\": \"like\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "http://localhost:8080/posts/rate",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "posts",
+              "rate"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Update User",
+        "id": "ba5c1daf-800b-4910-a181-d76badebb87c",
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        },
+        "request": {
+          "method": "PUT",
+          "header": [
+            {
+              "key": "user-id",
+              "value": "62e039d0-0729-4509-bede-9edd1dc4059b",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"name\": \"user8\"\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "http://localhost:8080/user",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "user"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Create Comment",
+        "id": "6fbac9bc-73d3-4b48-a76f-f1a99fdce5f8",
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        },
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "user-id",
+              "value": "62e039d0-0729-4509-bede-9edd1dc4059b",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"comment\": \"nice!\",\r\n    \"postId\": \"e14881eb-6cec-4ab2-a200-9666cb74d2d6\"\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "http://localhost:8080/comment",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8080",
+            "path": [
+              "comment"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Elasticsearch search",
+        "id": "699a0208-3414-4bfc-bf18-eb6e415a8f54",
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        },
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:9200/posts/_doc/efce718b-d554-415a-9686-af8d9ff6a04b",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "9200",
+            "path": [
+              "posts",
+              "_doc",
+              "efce718b-d554-415a-9686-af8d9ff6a04b"
+            ]
+          }
+        },
+        "response": []
+      }
+    ]
+  }
+}
